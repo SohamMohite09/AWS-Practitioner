@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmation — {{ booking.booking_id }}{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: 2rem;">
+  <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎉</div>
+  <h1 style="font-size: 2rem; font-weight: 800; color: var(--primary);">Booking Confirmed!</h1>
+  <p style="color: var(--gray-600); max-width: 600px; margin: 0.5rem auto;">
+    Your reservation has been recorded in <strong>Amazon DynamoDB</strong> and an email notification has been dispatched via <strong>Amazon SNS</strong>.
+  </p>
+</div>
+
+<!-- Boarding Pass / Ticket Card -->
+<div class="ticket-card">
+  <div class="ticket-header">
+    <div>
+      <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85;">E-Ticket Voucher</div>
+      <h2 style="font-size: 1.5rem; margin-top: 2px;">{{ booking.booking_id }}</h2>
+    </div>
+    <div style="text-align: right;">
+      <span class="service-type-badge badge-{{ booking.type }}" style="font-size: 0.85rem; padding: 4px 12px;">
+        {{ booking.type }}
+      </span>
+      <div style="font-size: 0.8rem; margin-top: 4px; color: #a5b4fc;">Status: {{ booking.status }}</div>
+    </div>
+  </div>
+
+  <div class="ticket-body">
+    <div class="ticket-grid">
+      <div class="ticket-field">
+        <span class="field-label">Primary Traveler</span>
+        <span class="field-value">{{ booking.email }}</span>
+      </div>
+      <div class="ticket-field">
+        <span class="field-label">Travel Date</span>
+        <span class="field-value">{{ booking.date }}</span>
+      </div>
+      <div class="ticket-field">
+        <span class="field-label">Route / Location</span>
+        <span class="field-value">{{ booking.source }} → {{ booking.destination }}</span>
+      </div>
+      <div class="ticket-field">
+        <span class="field-label">Seat / Room Number</span>
+        <span class="field-value" style="color: var(--primary);">{{ booking.seat }}</span>
+      </div>
+      <div class="ticket-field">
+        <span class="field-label">Service Details</span>
+        <span class="field-value" style="font-size: 0.95rem;">{{ booking.details }}</span>
+      </div>
+      <div class="ticket-field">
+        <span class="field-label">Payment Method & Ref</span>
+        <span class="field-value" style="font-size: 0.95rem;">{{ booking.payment_method }} ({{ booking.payment_reference }})</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticket-footer">
+    <div>
+      <div style="font-size: 0.8rem; color: var(--gray-600);">Total Paid</div>
+      <div style="font-size: 1.4rem; font-weight: 800; color: var(--gray-900);">₹{{ booking.price }}</div>
+    </div>
+    <div style="text-align: right; font-family: monospace; letter-spacing: 2px; color: var(--gray-400); font-size: 0.85rem;">
+      ||| | |||| | ||||| || |||
+      <div style="font-size: 0.7rem; color: var(--gray-500); letter-spacing: normal;">AWS CLOUD VERIFIED</div>
+    </div>
+  </div>
+</div>
+
+<div style="display: flex; justify-content: center; gap: 1rem; margin-top: 2rem;">
+  <button onclick="printTicket()" class="btn btn-outline">
+    🖨️ Print / Save Ticket
+  </button>
+  <a href="{{ url_for('dashboard.view_dashboard') }}" class="btn btn-primary">
+    📊 Go to My Bookings Dashboard
+  </a>
+</div>
+{% endblock %}

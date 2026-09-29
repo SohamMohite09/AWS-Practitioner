@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}TravelGo — Plan Your Journey Across India{% endblock %}
+
+{% block content %}
+<!-- Hero Search Section -->
+<section class="hero-section">
+  <h1 class="hero-title">Plan Your Journey With Ease</h1>
+  <p class="hero-subtitle">
+    Book verified Buses, High-Speed Trains, Domestic Flights, and Top Hotels with real-time AWS Cloud confirmation.
+  </p>
+
+  <div class="search-card">
+    <div class="search-tabs">
+      <button type="button" class="tab-btn active" data-category="bus">🚌 Bus</button>
+      <button type="button" class="tab-btn" data-category="train">🚆 Train</button>
+      <button type="button" class="tab-btn" data-category="flight">✈️ Flight</button>
+      <button type="button" class="tab-btn" data-category="hotels">🏨 Hotels</button>
+    </div>
+
+    <form action="{{ url_for('travel.search') }}" method="GET">
+      <input type="hidden" name="category" id="category-input" value="bus">
+
+      <!-- Route Search Fields (Bus / Train / Flight) -->
+      <div id="route-fields" class="search-grid">
+        <div class="form-group">
+          <label class="form-label">From City</label>
+          <select name="source" class="form-control">
+            <option value="">Any Source City</option>
+            {% for city in cities %}
+              <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">To Destination</label>
+          <select name="destination" class="form-control">
+            <option value="">Any Destination City</option>
+            {% for city in cities %}
+              <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Travel Date</label>
+          <input type="date" name="date" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          🔍 Search
+        </button>
+      </div>
+
+      <!-- Hotel Search Fields -->
+      <div id="hotel-fields" class="search-grid" style="display: none;">
+        <div class="form-group">
+          <label class="form-label">City / Destination</label>
+          <select name="hotel_city" class="form-control">
+            <option value="">All Cities</option>
+            {% for city in cities %}
+              <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hotel Category</label>
+          <select name="hotel_type" class="form-control">
+            <option value="all">All Categories</option>
+            <option value="budget">Budget Friendly (Under ₹3000)</option>
+            <option value="luxury">Luxury & Resorts</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          🔍 Find Hotels
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Features / Architecture highlights -->
+<section style="margin-top: 3rem;">
+  <div class="section-header">
+    <h2 class="section-title">Why Choose TravelGo Cloud?</h2>
+  </div>
+
+  <div class="card-grid">
+    <div class="travel-card">
+      <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
+      <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Instant Cloud Confirmation</h3>
+      <p style="color: var(--gray-600); font-size: 0.9rem;">
+        Powered by Amazon DynamoDB for ultra-low latency transaction persistence and atomic booking confirmation.
+      </p>
+    </div>
+
+    <div class="travel-card">
+      <div style="font-size: 2rem; margin-bottom: 0.5rem;">📩</div>
+      <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Real-time SNS Notifications</h3>
+      <p style="color: var(--gray-600); font-size: 0.9rem;">
+        Automatic email delivery for booking confirmations and cancellations via Amazon Simple Notification Service.
+      </p>
+    </div>
+
+    <div class="travel-card">
+      <div style="font-size: 2rem; margin-bottom: 0.5rem;">🛡️</div>
+      <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">Secure IAM Architecture</h3>
+      <p style="color: var(--gray-600); font-size: 0.9rem;">
+        Hosted securely on Amazon EC2 with role-based IAM permissions adhering to least-privilege security standards.
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}

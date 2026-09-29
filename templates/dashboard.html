@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard — TravelGo{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">My Travel Dashboard</h1>
+    <p style="color: var(--gray-600); font-size: 0.95rem;">
+      Logged in as <strong>{{ user.name }}</strong> ({{ user.email }})
+    </p>
+  </div>
+  <a href="{{ url_for('travel.home') }}" class="btn btn-primary btn-sm">+ Book New Journey</a>
+</div>
+
+<!-- Stats Counter Grid -->
+<div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem;">
+  <div class="travel-card" style="padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--gray-600); text-transform: uppercase; font-weight: 700;">Total Bookings</div>
+    <div style="font-size: 2rem; font-weight: 800; color: var(--primary);">{{ stats.total }}</div>
+  </div>
+  <div class="travel-card" style="padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--gray-600); text-transform: uppercase; font-weight: 700;">Active Trips</div>
+    <div style="font-size: 2rem; font-weight: 800; color: var(--success);">{{ stats.active }}</div>
+  </div>
+  <div class="travel-card" style="padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--gray-600); text-transform: uppercase; font-weight: 700;">Cancelled</div>
+    <div style="font-size: 2rem; font-weight: 800; color: var(--danger);">{{ stats.cancelled }}</div>
+  </div>
+  <div class="travel-card" style="padding: 1.25rem;">
+    <div style="font-size: 0.8rem; color: var(--gray-600); text-transform: uppercase; font-weight: 700;">Logins Count</div>
+    <div style="font-size: 2rem; font-weight: 800; color: var(--accent);">{{ stats.logins }}</div>
+  </div>
+</div>
+
+<!-- Active Upcoming Bookings -->
+<h2 style="font-size: 1.3rem; margin-bottom: 1rem;">Active & Upcoming Trips ({{ active_bookings|length }})</h2>
+
+{% if not active_bookings %}
+  <div class="travel-card" style="text-align: center; padding: 2.5rem; margin-bottom: 2rem;">
+    <p style="color: var(--gray-600); margin-bottom: 1rem;">You do not have any active bookings right now.</p>
+    <a href="{{ url_for('travel.home') }}" class="btn btn-outline btn-sm">Explore Bus, Train, Flight & Hotels</a>
+  </div>
+{% else %}
+  <div class="card-grid" style="margin-bottom: 2.5rem;">
+    {% for booking in active_bookings %}
+      <div class="travel-card">
+        <div>
+          <div class="card-top">
+            <div>
+              <span class="service-type-badge badge-{{ booking.type }}">{{ booking.type }}</span>
+              <span class="service-type-badge" style="background: #d1fae5; color: #065f46; margin-left: 4px;">CONFIRMED</span>
+              <h3 style="font-size: 1.1rem; margin-top: 0.4rem;">{{ booking.booking_id }}</h3>
+            </div>
+            <div style="font-weight: 800; color: var(--gray-900);">
+              ₹{{ booking.price }}
+            </div>
+          </div>
+
+          <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 0.5rem;">
+            <strong>Route:</strong> {{ booking.source }} → {{ booking.destination }}
+          </p>
+          <p style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 0.5rem;">
+            <strong>Date:</strong> {{ booking.date }} | <strong>Seat/Room:</strong> {{ booking.seat }}
+          </p>
+          <p style="font-size: 0.8rem; color: var(--gray-600); margin-bottom: 1rem;">
+            {{ booking.details }}
+          </p>
+        </div>
+
+        <div class="card-footer-action">
+          <a href="{{ url_for('booking.confirmation', booking_id=booking.booking_id) }}" class="btn btn-outline btn-sm">
+            View Ticket
+          </a>
+          
+          <!-- Cancel Form with Safety Confirmation -->
+          <form action="{{ url_for('dashboard.cancel_booking', booking_id=booking.booking_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel booking {{ booking.booking_id }}?');">
+            <button type="submit" class="btn btn-danger btn-sm">
+              Cancel Trip
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- Cancelled / Past Bookings History -->
+{% if cancelled_bookings %}
+  <h2 style="font-size: 1.3rem; margin-bottom: 1rem; color: var(--gray-700);">Cancelled History ({{ cancelled_bookings|length }})</h2>
+  <div class="card-grid">
+    {% for booking in cancelled_bookings %}
+      <div class="travel-card" style="opacity: 0.75;">
+        <div>
+          <div class="card-top">
+            <div>
+              <span class="service-type-badge badge-{{ booking.type }}">{{ booking.type }}</span>
+              <span class="service-type-badge" style="background: #fee2e2; color: #991b1b; margin-left: 4px;">CANCELLED</span>
+              <h3 style="font-size: 1.1rem; margin-top: 0.4rem;">{{ booking.booking_id }}</h3>
+            </div>
+            <div style="font-weight: 800; color: var(--gray-600); text-decoration: line-through;">
+              ₹{{ booking.price }}
+            </div>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--gray-600);">
+            {{ booking.source }} → {{ booking.destination }} ({{ booking.date }})
+          </p>
+        </div>
+        <div class="card-footer-action">
+          <small style="color: var(--gray-400);">Cancelled & SNS Notification Sent</small>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

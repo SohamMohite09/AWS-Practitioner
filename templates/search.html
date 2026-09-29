@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results — TravelGo{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h1 class="section-title">
+      {% if category == 'bus' %}🚌 Bus Results
+      {% elif category == 'train' %}🚆 Train Schedules
+      {% elif category == 'flight' %}✈️ Flight Options
+      {% elif category == 'hotels' %}🏨 Hotel Accommodations
+      {% else %}Search Results
+      {% endif %}
+    </h1>
+    <p style="color: var(--gray-600); font-size: 0.9rem;">
+      Found {{ results|length }} available option(s) for your trip.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 0.5rem;">
+    <a href="{{ url_for('travel.search', category='bus', source=source, destination=destination) }}" class="btn btn-outline btn-sm {% if category == 'bus' %}btn-primary{% endif %}">Bus</a>
+    <a href="{{ url_for('travel.search', category='train', source=source, destination=destination) }}" class="btn btn-outline btn-sm {% if category == 'train' %}btn-primary{% endif %}">Train</a>
+    <a href="{{ url_for('travel.search', category='flight', source=source, destination=destination) }}" class="btn btn-outline btn-sm {% if category == 'flight' %}btn-primary{% endif %}">Flight</a>
+    <a href="{{ url_for('travel.search', category='hotels', hotel_city=hotel_city) }}" class="btn btn-outline btn-sm {% if category == 'hotels' %}btn-primary{% endif %}">Hotels</a>
+  </div>
+</div>
+
+{% if not results %}
+  <div class="travel-card" style="text-align: center; padding: 3rem;">
+    <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔍</div>
+    <h3>No listings found matching your search.</h3>
+    <p style="color: var(--gray-600); margin: 0.5rem 0 1.5rem;">
+      Try searching between popular hub cities like Mumbai, Delhi, Bengaluru, Hyderabad, or Goa.
+    </p>
+    <a href="{{ url_for('travel.home') }}" class="btn btn-primary">Modify Search</a>
+  </div>
+{% else %}
+  <div class="card-grid">
+    {% for item in results %}
+      <div class="travel-card">
+        <div>
+          <div class="card-top">
+            <div>
+              <span class="service-type-badge badge-{{ item.type }}">
+                {{ item.type }}
+              </span>
+              {% if item.category %}
+                <span class="service-type-badge badge-{{ item.category }}" style="margin-left: 4px;">
+                  {{ item.category }}
+                </span>
+              {% endif %}
+              <h3 style="font-size: 1.15rem; margin-top: 0.4rem;">{{ item.name }}</h3>
+            </div>
+            <div style="font-weight: 700; color: var(--accent);">
+              ⭐ {{ item.rating }}
+            </div>
+          </div>
+
+          {% if item.type == 'hotel' %}
+            <p style="color: var(--gray-600); font-size: 0.85rem; margin-bottom: 0.75rem;">
+              📍 {{ item.location }}, {{ item.city }}
+            </p>
+          {% else %}
+            <!-- Route Timings -->
+            <div class="route-container">
+              <div class="route-stop">
+                <div class="route-time">{{ item.departure_time }}</div>
+                <div class="route-city">{{ item.source }}</div>
+              </div>
+              <div class="route-duration">
+                {{ item.duration }}
+              </div>
+              <div class="route-stop">
+                <div class="route-time">{{ item.arrival_time }}</div>
+                <div class="route-city">{{ item.destination }}</div>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Amenities -->
+          <div class="amenities-list">
+            {% for amenity in item.amenities %}
+              <span class="amenity-chip">✓ {{ amenity }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="card-footer-action">
+          <div>
+            <div class="price-tag">₹{{ item.price or item.price_per_night }}</div>
+            <div class="price-subtext">
+              {% if item.type == 'hotel' %}per room / night{% else %}per passenger{% endif %}
+            </div>
+          </div>
+
+          <a href="{{ url_for('booking.book_item', item_id=item.id, date=item.date or travel_date) }}" class="btn btn-primary">
+            {% if item.type == 'hotel' %}Book Room →{% else %}Select Seat →{% endif %}
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

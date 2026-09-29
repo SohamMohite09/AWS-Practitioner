@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Booking — {{ item.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+  <div class="section-header">
+    <h1 class="section-title">Review & Complete Your Reservation</h1>
+    <a href="javascript:history.back()" class="btn btn-outline btn-sm">← Back</a>
+  </div>
+
+  <form action="{{ url_for('booking.submit_booking') }}" method="POST">
+    <input type="hidden" name="item_id" value="{{ item.id }}">
+    <input type="hidden" name="travel_date" value="{{ travel_date }}">
+
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem;">
+      <!-- Left Column: Seat / Room Selection -->
+      <div>
+        {% if item.type != 'hotel' %}
+          <div class="search-card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">💺 Choose Your Preferred Seat</h3>
+            <p style="color: var(--gray-600); font-size: 0.85rem; margin-bottom: 1rem;">
+              Click on an available seat to assign it to your ticket.
+            </p>
+
+            <div class="seat-map-wrapper">
+              <div class="cabin-front">⬆️ FRONT / DRIVER CABIN</div>
+              
+              <div class="seat-grid">
+                {% for i in range(1, 25) %}
+                  {% set seat_num = "%02d"|format(i) %}
+                  {% set is_occupied = (i in [3, 7, 14, 19]) %}
+                  <div class="seat-item {% if is_occupied %}occupied{% elif loop.first %}selected{% endif %}" 
+                       data-seat="Seat-{{ seat_num }}">
+                    {{ seat_num }}
+                  </div>
+                {% endfor %}
+              </div>
+
+              <div class="seat-legend">
+                <div class="legend-item">
+                  <div class="legend-box" style="border: 2px solid #cbd5e1; background: #fff;"></div>
+                  <span>Available</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-box" style="background: var(--primary);"></div>
+                  <span>Selected</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-box" style="background: var(--gray-200);"></div>
+                  <span>Booked</span>
+                </div>
+              </div>
+            </div>
+
+            <input type="hidden" name="seat" id="selected-seat-input" value="Seat-01">
+            <div style="text-align: center; margin-top: 0.75rem; font-weight: 600;">
+              Selected Seat: <span id="selected-seat-display" style="color: var(--primary);">Seat-01</span>
+            </div>
+          </div>
+        {% else %}
+          <!-- Hotel Room Type Selection -->
+          <div class="search-card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">🛏️ Select Room Type</h3>
+            <div class="form-group" style="margin-top: 1rem;">
+              <select name="room_type" class="form-control">
+                {% for room in item.room_types %}
+                  <option value="{{ room }}">{{ room }} (Complimentary Breakfast)</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Payment Method Selection -->
+        <div class="search-card">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">💳 Select Payment Method</h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="payment_method" value="UPI" checked>
+              <strong>UPI (GPay, PhonePe, Paytm)</strong>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="payment_method" value="Credit/Debit Card">
+              <strong>Credit / Debit Card (Visa, Mastercard, RuPay)</strong>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="radio" name="payment_method" value="Net Banking">
+              <strong>Net Banking (All Major Banks)</strong>
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-top: 1.25rem;">
+            <label class="form-label">Payment Transaction Reference</label>
+            <input type="text" name="payment_reference" value="{{ sample_ref }}" class="form-control" readonly style="background: var(--gray-100);">
+            <small style="color: var(--gray-400);">Generated for AWS Practitioner reservation tracking</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Booking Summary Card -->
+      <div>
+        <div class="search-card" style="border: 2px solid var(--primary-light);">
+          <h3 style="font-size: 1.2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem;">
+            Trip Summary
+          </h3>
+
+          <div style="margin-bottom: 1rem;">
+            <span class="service-type-badge badge-{{ item.type }}">{{ item.type }}</span>
+            <h4 style="margin-top: 0.35rem;">{{ item.name }}</h4>
+          </div>
+
+          <div style="font-size: 0.9rem; color: var(--gray-700); margin-bottom: 1rem; line-height: 1.8;">
+            {% if item.type != 'hotel' %}
+              <div><strong>From:</strong> {{ item.source }}</div>
+              <div><strong>To:</strong> {{ item.destination }}</div>
+              <div><strong>Departure:</strong> {{ item.departure_time }} ({{ travel_date }})</div>
+              <div><strong>Arrival:</strong> {{ item.arrival_time }}</div>
+            {% else %}
+              <div><strong>City:</strong> {{ item.city }}</div>
+              <div><strong>Location:</strong> {{ item.location }}</div>
+              <div><strong>Check-in:</strong> {{ travel_date }}</div>
+            {% endif %}
+            <div><strong>Passenger:</strong> {{ user_name }} ({{ user_email }})</div>
+          </div>
+
+          <div style="border-top: 1px dashed var(--gray-200); padding-top: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.3rem;">
+              <span>Total Price:</span>
+              <span style="color: var(--primary);">₹{{ item.price or item.price_per_night }}</span>
+            </div>
+            <small style="color: var(--gray-400);">Inclusive of all taxes & AWS SNS alert</small>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem;">
+            🔒 Confirm & Save Reservation
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

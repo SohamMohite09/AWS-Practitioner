@@ -127,33 +127,34 @@ Never create a personal AWS account as part of this project.
 
 ## 8. Current Phase
 
-Update this section after each completed phase.
-
 Current phase:
 ```text
-Phase 0 — Repository Preparation
+Phase 7/8 — EC2 Deployment, AWS Setup Scripts & Documentation
 ```
 
 Current status:
 ```text
-Not started / update this after work begins
+Complete — Application built, tested, and prepared for GitHub push & EC2 deployment
 ```
 
 ## 9. Completed Work
 
-Update this list chronologically.
-
 ```text
-- Project specification reviewed
-- Project documentation files created
+- Project specification and requirements reviewed
+- Flask backend application architecture built (auth, travel, booking, dashboard)
+- DynamoDB service layer implemented with Users and Bookings entities
+- Local fallback mock store implemented for 100% offline testability
+- Amazon SNS email notification integration added
+- Responsive frontend built with custom CSS, interactive seat picker, and printable boarding passes
+- AWS automated provisioning script (scripts/setup_aws_resources.py) created
+- Production EC2 deployment bundle (systemd service, Nginx config, setup script) created
+- Comprehensive DEPLOYMENT_GUIDE.md and README.md prepared
 ```
 
 ## 10. Active Work
 
-Write the current task here.
-
 ```text
-No active implementation task recorded yet.
+Pushed codebase to GitHub repository: https://github.com/SohamMohite09/AWS-Practitioner
 ```
 
 ## 11. Known Decisions
