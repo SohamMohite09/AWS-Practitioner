@@ -6,7 +6,7 @@ Handles seat selection, review, checkout, DynamoDB storage, SNS notification, an
 import uuid
 import random
 import string
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from routes.auth import login_required
 from services.travel_data import get_item_by_id
@@ -34,7 +34,7 @@ def book_item(item_id):
         flash("Selected travel or hotel item not found.", "danger")
         return redirect(url_for("travel.home"))
 
-    travel_date = request.args.get("date", datetime.utcnow().strftime("%Y-%m-%d"))
+    travel_date = request.args.get("date", datetime.now(timezone.utc).strftime("%Y-%m-%d"))
     preset_seat = request.args.get("seat", "")
     sample_ref = generate_payment_ref()
 

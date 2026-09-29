@@ -7,10 +7,13 @@ Includes seamless local fallback persistence for offline development & testing.
 import os
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from config import Config
 
 logger = logging.getLogger(__name__)
+
+def get_current_time():
+    return datetime.now(timezone.utc).isoformat()
 
 class DynamoDBService:
     def __init__(self):
@@ -84,7 +87,7 @@ class DynamoDBService:
             "name": name.strip(),
             "password": password_hash,
             "logins": 1,
-            "created_at": datetime.utcnow().isoformat()
+            "created_at": get_current_time()
         }
 
         if not self.use_mock and self.users_table:
@@ -148,7 +151,7 @@ class DynamoDBService:
             "payment_method": booking_data.get("payment_method", "UPI"),
             "payment_reference": booking_data.get("payment_reference", ""),
             "status": booking_data.get("status", "CONFIRMED"),
-            "created_at": datetime.utcnow().isoformat()
+            "created_at": get_current_time()
         }
 
         if not self.use_mock and self.bookings_table:
